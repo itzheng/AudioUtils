@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 
 import org.itzheng.and.audio.visualizer.IVisualizerRenderer;
 
@@ -14,7 +15,8 @@ import org.itzheng.and.audio.visualizer.IVisualizerRenderer;
  */
 public class MyFFTRenderer implements IVisualizerRenderer {
     private byte[] mBytes;
-    private int mSpectrumNum = 48 * 1;
+    private int mSpectrumNum = 48 * 2;
+    private static final String TAG = "MyFFTRenderer";
 
     @Override
     public void render(Canvas canvas, byte[] fft) {
@@ -55,7 +57,7 @@ public class MyFFTRenderer implements IVisualizerRenderer {
             if (mBytes[i] < 0) {
                 mBytes[i] = 127;
             }
-
+            Log.d(TAG, "mBytes i:" + mBytes[i]);
             final int xi = baseX * i + baseX / 2;
 
             mPoints[i * 4] = xi;
