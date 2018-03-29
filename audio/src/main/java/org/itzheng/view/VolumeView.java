@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import org.itzheng.and.audio.visualizer.IVisualizerRenderer;
+import org.itzheng.and.audio.visualizer.impl.MyChannelRenderer;
 import org.itzheng.and.audio.visualizer.impl.MyVolumeRenderer;
 
 import java.util.Arrays;
@@ -25,7 +26,7 @@ public class VolumeView extends View implements IVisualizer {
     {
         //设置默认渲染器
         if (mRenderer == null) {
-            setRenderer(MyVolumeRenderer.newInstance());
+            setRenderer(MyChannelRenderer.newInstance());
         }
     }
 

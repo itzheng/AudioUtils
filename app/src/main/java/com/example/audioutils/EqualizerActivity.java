@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.itzheng.and.audio.visualizer.impl.MyChannelRenderer;
 import org.itzheng.and.audio.visualizer.impl.MyVolumeRenderer;
 import org.itzheng.view.VisualizerFFTView;
 import org.itzheng.view.VolumeView;
@@ -44,7 +45,7 @@ public class EqualizerActivity extends AppCompatActivity {
     /**
      * 是否使用系统播放器
      */
-    private boolean isSystemDef = false;
+    private boolean isSystemDef = true;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -95,7 +96,11 @@ public class EqualizerActivity extends AppCompatActivity {
                                               int samplingRate) {
                 waveFormView.updateVisualizer(waveform);
                 if (tvAvgWave != null) {
-                    tvAvgWave.setText("" + samplingRate);
+                    byte[] test = new byte[500];
+                    for (int i = 0; i < test.length; i++) {
+                        test[i] = (byte) 150;
+                    }
+                    tvAvgWave.setText("" + getAveragePowerForChannel(test));
                 }
             }
 
@@ -103,7 +108,14 @@ public class EqualizerActivity extends AppCompatActivity {
                 fftView.updateVisualizer(fft);
                 volumeView.updateVisualizer(fft);
                 if (tvAvgFFT != null) {
-                    tvAvgFFT.setText("" + MyVolumeRenderer.getVolumeOfFFT(fft));
+//                    tvAvgFFT.setText("" + MyVolumeRenderer.getVolumeOfFFT(fft));
+                    byte[] frequency = MyVolumeRenderer.fft2Frequency(fft);
+                    int max = (int) MyChannelRenderer.getMaxPowerForChannel(frequency);
+                    int volume = (int) MyChannelRenderer.getAveragePowerForChannel(frequency);
+                    tvAvgFFT.setText("max:" + max// + ",min:" + getMin(frequency)
+//                            + ",volume:" + MyVolumeRenderer.getVolumeOfFFT(fft));
+                            + ",volume:" + volume
+                            + "\n " + (max > volume));
                 }
             }
         }, Visualizer.getMaxCaptureRate() / 2, true, true);
@@ -136,6 +148,43 @@ public class EqualizerActivity extends AppCompatActivity {
             }
             mEqualizer.setEnabled(true);
         }
+    }
+
+    private int getAveragePowerForChannel(byte[] frequency) {
+        int sum = 0;
+//        int count = 0;
+        for (int i = 0; i < frequency.length; i++) {
+//            if ()
+            sum = sum + frequency[i] * frequency[i];
+        }
+//        if (false && count == 0) {
+//            return 0;
+//        }
+        return (int) Math.sqrt(sum / frequency.length);
+    }
+
+    private byte getMin(byte[] frequency) {
+        byte min = frequency[0];
+        for (int i = 1; i < frequency.length; i++) {
+            if (frequency[i] < min) {
+                min = frequency[i];
+            }
+        }
+        return min;
+    }
+
+    private byte getMax(byte[] frequency) {
+
+        byte max = frequency[0];
+        for (int i = 1; i < frequency.length; i++) {
+            if (frequency[i] > max) {
+                max = frequency[i];
+            }
+        }
+        if (true) {
+            return (byte) Math.sqrt(max);
+        }
+        return max;
     }
 
     private int sumOfBytes(byte[] bytes) {
